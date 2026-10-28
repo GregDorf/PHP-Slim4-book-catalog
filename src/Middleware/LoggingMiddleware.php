@@ -4,8 +4,8 @@ namespace BookCatalog\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface as Middleware;
-use  Psr\Http\Message\ResponseInterface;
-use \Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 class LoggingMiddleware implements Middleware
 {
@@ -16,18 +16,22 @@ class LoggingMiddleware implements Middleware
         $path = $request->getUri()->getPath();
 
         $startTime = microtime(true);
-        $response = $handler->handle($request);
-        $duration = round((microtime(true) - $startTime) * 1000, 2);
+        $status = 500;
 
-        $logDir = __DIR__ . '/../../logs';
+        try {
+            $response = $handler->handle($request);
+            $status = $response->getStatusCode();
+            return $response;
+        } finally {
+            $duration = round((microtime(true) - $startTime) * 1000, 2);
 
-        if (!is_dir($logDir)) {
-            mkdir($logDir, 0777, true);
+            $logDir = __DIR__ . '/../../logs';
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0777, true);
+            }
+
+            $logLine = "[$timestamp] {$method} {$path} - Status: {$status} - {$duration}ms\n";
+            @file_put_contents($logDir . '/app.log', $logLine, FILE_APPEND);
         }
-
-        $logLine = "[$timestamp] {$method} {$path} - {$duration}ms\n";
-        file_put_contents($logDir . '/app.log', $logLine, FILE_APPEND);
-
-        return $response;
     }
 }
