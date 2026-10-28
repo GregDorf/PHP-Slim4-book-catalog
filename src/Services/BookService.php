@@ -38,12 +38,16 @@ class BookService
 
     private function validateBookData(array $data): void
     {
-        if (empty($data['title']) || empty($data['author']) || empty($data['year'])) {
+        $title = trim((string) ($data['title'] ?? ''));
+        $author = trim((string) ($data['author'] ?? ''));
+        $year = isset($data['year']) ? (int) $data['year'] : 0;
+
+        if ($title === '' || $author === '' || $year === 0) {
             throw new InvalidArgumentException('Поля "название", "автор" и "год" обязательны для заполнения.');
         }
-        
+
         $currentYear = (int) date('Y');
-        if ((int)$data['year'] > $currentYear) {
+        if ($year > $currentYear) {
             throw new InvalidArgumentException('Год в книге не может быть будущим.');
         }
     }
