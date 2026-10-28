@@ -1,0 +1,22 @@
+# Зависимости Composer
+/vendor/
+
+# Настройки редакторов кода и IDE
+tasks.json
+
+# Настройки VS Code / PhpStorm:
+.vscode/
+.idea/
+
+# Конфиденциальные данные и настройки окружения
+.env
+.env.local
+.env.*.local
+
+# Логи и кэш
+*.log
+.phpunit.result.cache
+
+# Файлы операционных систем
+.DS_Store
+Thumbs.db
